@@ -50,7 +50,7 @@ variable "aws_source_ami_filter_ubuntu_2204_hvm" {
     owners = list(string)
   })
   default = {
-    name = "aws-parallelcluster-3.12.0-ubuntu-2204-lts-hvm-x86_64-202412170018 2024-12-17T00-22-52.615Z"
+    name = "aws-parallelcluster-3.13.2-ubuntu-2204-lts-hvm-x86_64-202506200243 2025-06-20T02-47-33.760Z"
     owners = [
       "247102896272"
     ]
@@ -93,7 +93,7 @@ variable "root_volume_size" {
 ###
 
 source "amazon-ebs" "base" {
-  ami_name                    = "da-cluster-${local.now}.x86_64-gp3"
+  ami_name                    = "uifcw-cluster-${local.now}.x86_64-gp3"
   ami_regions                 = var.aws_ami_regions
   ami_users                   = var.aws_ami_users
   ami_groups                  = var.aws_ami_groups
@@ -118,7 +118,7 @@ source "amazon-ebs" "base" {
   ssh_username                          = var.aws_ssh_username
   ssh_interface                         = "private_ip"
   subnet_id                             = "subnet-04d911e4b55853ef7"
-  tags                                  = { Name = "DA-Cluster-${local.now}" }
+  tags                                  = { Name = "UIFCW-Cluster-${local.now}" }
   temporary_security_group_source_cidrs = var.aws_temporary_security_group_source_cidrs
 }
 
@@ -130,8 +130,8 @@ source "amazon-ebs" "base" {
 
 build {
   source "amazon-ebs.base" {
-    ami_description = "DA Training Cluster"
-    name            = "DA-Cluster-Ubuntu-22.04-hvm"
+    ami_description = "UIFCW Training Cluster"
+    name            = "UIFCW-Cluster-Ubuntu-22.04-hvm"
     source_ami_filter {
       filters = {
         virtualization-type = "hvm"

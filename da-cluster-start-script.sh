@@ -23,7 +23,7 @@ DEBIAN_FRONTEND=noninteractive apt install -y lua-posix
 
 # install cmake
 cd /opt/build 
-curl -LO https://github.com/Kitware/CMake/releases/download/v3.23.1/cmake-3.23.1-linux-x86_64.sh && /bin/bash cmake-3.23.1-linux-x86_64.sh --prefix=/usr/local --skip-license
+curl -LO https://github.com/Kitware/CMake/releases/download/v3.27.9/cmake-3.27.9-linux-x86_64.sh && /bin/bash cmake-3.27.9-linux-x86_64.sh --prefix=/usr/local --skip-license
 # install lmod
 wget https://sourceforge.net/projects/lmod/files/Lmod-8.7.tar.bz2
 tar vxjf Lmod-8.7.tar.bz2
@@ -37,66 +37,82 @@ DEBIAN_FRONTEND=noninteractive apt-get update -yq --allow-unauthenticated
 #rm /etc/profile.d/modules.sh
 #dpkg -S /etc/profile.d/modules.sh
 cd /opt
-git clone -b release/1.6.0 --recurse-submodules https://github.com/jcsda/spack-stack.git
+git clone -b release/1.9.0 --recurse-submodules https://github.com/jcsda/spack-stack.git
 cd spack-stack
 . ./setup.sh
 spack compiler find
 spack compiler rm gcc@12.3.0
-spack install intel-oneapi-compilers
-spack install intel-oneapi-mpi
-spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
-spack external find wget
-spack external find m4
-spack external find git
-spack external find curl
-spack external find git-lfs
-spack external find openssl
-spack external find libjpeg-turbo
-spack external find perl
-spack external find python
-spack external find cmake
-spack external find diffutils 
-spack install zlib
-spack install cmake
-spack install curl
-spack install --add diffutils@3.8
-spack module lmod refresh -y --delete-tree && source /usr/share/lmod/lmod/init/bash && module avail
-echo "source /usr/share/lmod/lmod/init/bash" >> /root/.bashenv
-echo "module use /opt/spack-stack/spack/share/spack/lmod/linux-ubuntu22.04-x86_64/Core" >> /root/.bashenv
-echo "module load cmake intel-oneapi-compilers intel-oneapi-mpi " >> /root/.bashenv
-echo "[[ -s ~/.bashenv ]] && source ~/.bashenv" >> /root/.bashrc
-spack stack create env --site linux.default --template unified-dev --name unified-dev
-tee /opt/spack-stack/envs/unified-dev/spack.yaml <<EOF
+spack install intel-oneapi-compilers@2024.2.1
+spack install intel-oneapi-mpi@2021.14.0
+spack compiler add `spack location -i intel-oneapi-compilers`/opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-*/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-*/compiler/latest/bin
+spack stack create env --site linux.default --template unified-dev --name ue-oneapi-2024.2.1 --compiler oneapi 
+tee /opt/spack-stack/envs/ue-oneapi-2024.2.1/spack.yaml <<EOF
+# spack-stack hash: 261cfcc
+# spack hash: f1be100187
 spack:
   concretizer:
     unify: when_possible
 
- 
   view: false
   include:
   - site
   - common
 
   definitions:
-  - compilers: ['%intel']
+  - compilers:
+    - '%oneapi'
   - packages:
-    - ufs-srw-app-env ^mapl@2.40.3 ^esmf@8.5.0
+    - ufs-srw-app-env       ^esmf@=8.8.0 ^crtm@=3.1.1-build1
+    - ufs-weather-model-env ^esmf@=8.8.0 ^crtm@=3.1.1-build1
+    - crtm@3.1.1-build1
+    - mapl@2.53.4 ^esmf@8.8.0
+    - esmf@=8.8.0 snapshot=none
   specs:
   - matrix:
-    - [\$packages]
-    - [\$compilers]
+    - [$packages]
+    - [$compilers]
     exclude:
-        # jedi-tools doesn't build with Intel
+    # Don't build ai-env and jedi-tools-env with Intel or oneAPI,
+    # some packages don't build (e.g., py-torch in ai-env doesn't
+    # build with Intel, and there are constant problems concretizing
+    # the environment
+    - ai-env%intel
+    - ai-env%oneapi
     - jedi-tools-env%intel
+    - jedi-tools-env%oneapi
+  packages:
+    all:
+      prefer: ['%oneapi']
+  modules:
+    default:
+      lmod:
+        core_compilers:
+        - gcc@=11.4.0
+  bootstrap:
+    enable: true
+    root: $spack/bootstrap
+    sources:
+    - name: github-actions-v0.6
+      metadata: $spack/share/spack/bootstrap/github-actions-v0.6
+    - name: github-actions-v0.5
+      metadata: $spack/share/spack/bootstrap/github-actions-v0.5
+    - name: spack-install
+      metadata: $spack/share/spack/bootstrap/spack-install
+    trusted:
+    # By default we trust bootstrapping from sources and from binaries
+    # produced on Github via the workflow
+      github-actions-v0.6: true
+      github-actions-v0.5: true
+      spack-install: true
 EOF
 
-cd /opt/spack-stack/envs/unified-dev
+cd /opt/spack-stack/envs/ue-oneapi-2024.2.1
 spack env activate -p .
 cd /opt/spack-stack
 . ./setup.sh 
 spack concretize 2>&1 | tee log.concretize
-spack install --verbose 2>&1 | tee log.install
-tee /opt/spack-stack/envs/unified-dev/site/modules.yaml <<EOF1
+spack install --verbose --fail-fast --show-log-on-error --no-check-signature 2>&1 | tee log.install
+tee /opt/spack-stack/envs/ue-oneapi-2024.2.1/site/modules.yaml <<EOF1
 modules:
   default:
     enable::
@@ -109,79 +125,10 @@ modules:
       - python
 EOF1
 
-tee /root/.spack/linux/compilers.yaml <<EOF2
-compilers:
-- compiler:
-    spec: gcc@=11.4.0
-    paths:
-      cc: /bin/gcc
-      cxx: /bin/g++
-      f77: /bin/gfortran
-      fc: /bin/gfortran
-    flags: {}
-    operating_system: ubuntu22.04
-    target: x86_64
-    modules: []
-    environment: {}
-    extra_rpaths: []
-- compiler:
-    spec: intel@=2021.10.0
-    paths:
-      cc: /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-sapphirerapids/gcc-11.4.0/intel-oneapi-compilers-2023.2.1-3xn2ybliqcwcftqzx27l2ig5ufm24f26/compiler/latest/linux/bin/intel64/icc
-      cxx: /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-sapphirerapids/gcc-11.4.0/intel-oneapi-compilers-2023.2.1-3xn2ybliqcwcftqzx27l2ig5ufm24f26/compiler/latest/linux/bin/intel64/icpc
-      f77: /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-sapphirerapids/gcc-11.4.0/intel-oneapi-compilers-2023.2.1-3xn2ybliqcwcftqzx27l2ig5ufm24f26/compiler/latest/linux/bin/intel64/ifort
-      fc: /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-sapphirerapids/gcc-11.4.0/intel-oneapi-compilers-2023.2.1-3xn2ybliqcwcftqzx27l2ig5ufm24f26/compiler/latest/linux/bin/intel64/ifort
-    flags: {}
-    operating_system: ubuntu22.04
-    target: x86_64
-    modules:
-    - intel-oneapi-compilers
-    environment: {}
-    extra_rpaths: [] 
-EOF2
-cp /root/.spack/linux/compilers.yaml /opt/spack-stack/envs/unified-dev/site 
+cp /root/.spack/linux/compilers.yaml /opt/spack-stack/envs/ue-oneapi-2024.2.1/site 
 cd /opt/spack-stack
 . ./setup.sh && source /usr/share/lmod/lmod/init/bash
-cd /opt/spack-stack/envs/unified-dev
+cd /opt/spack-stack/envs/ue-oneapi-2024.2.1
 spack env activate -p .
 spack module lmod refresh -y
 spack stack setup-meta-modules
-module use /opt/spack-stack/spack/share/spack/lmod/Core
-module load stack-intel/2021.10.0
-module load stack-openmpi
-
-#Install Apptainer/Singularity
-DEBIAN_FRONTEND=noninteractive apt install -y software-properties-common
-DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:apptainer/ppa 
-DEBIAN_FRONTEND=noninteractive apt-get update -yq --allow-unauthenticated 
-DEBIAN_FRONTEND=noninteractive apt install -y apptainer 
-DEBIAN_FRONTEND=noninteractive apt install -y ruby-full
-DEBIAN_FRONTEND=noninteractive apt install -y imagemagick
-
-#Install Rocoto, LandDA container and required datasets.
-
-su - ubuntu <<'EOF'
-
-sudo gem install sqlite3
-sudo gem install thread
-sudo gem install pool
-
-git clone https://github.com/christopherwharrop/rocoto.git
-cd rocoto/
-./INSTALL
-
-cd /home/ubuntu
-
-wget https://noaa-ufs-land-da-pds.s3.amazonaws.com/CADRE-2025/Land-DA_v2.1_inputs.tar.gz
-wget https://noaa-ufs-land-da-pds.s3.amazonaws.com/CADRE-2025/ubuntu22.04-intel-landda-cadre25.img
-
-
-tar -vxzf Land-DA_v2.1_inputs.tar.gz 
-
-echo 'export PATH="$PATH:/home/ubuntu/rocoto/bin"' >> .bashrc
-
-echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAoHZlCJT9Vc/FJDreza+Yl+q2ene0gYZTgfYs53/eUV' >> /home/ubuntu/.ssh/authorized_keys
-chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
-chmod 600 /home/ubuntu/.ssh/authorized_keys
-
-EOF

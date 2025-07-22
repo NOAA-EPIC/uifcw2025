@@ -1,13 +1,13 @@
 Region: us-east-1
 Image:
   Os: ubuntu2204 
-  CustomAmi: ami-0d42dfd58aacc4b25 
+  CustomAmi: ami-01861b0793635538d 
 HeadNode:
-  InstanceType: c7i.8xlarge
+  InstanceType: c7i.2xlarge
   Networking:
     SubnetId: subnet-088f38370a401610e 
   Ssh:
-    KeyName: epic_workshop 
+    KeyName: uifcw2025 
   LocalStorage:
     RootVolume:
       Size: 500
