@@ -82,7 +82,7 @@ variable "aws_temporary_security_group_source_cidrs" {
 variable "root_volume_size" {
   description = "Size in GB of the root volume"
   type        = number
-  default     = 330
+  default     = 350
 }
 
 
@@ -117,7 +117,7 @@ source "amazon-ebs" "base" {
   ssh_timeout                           = "60m"
   ssh_username                          = var.aws_ssh_username
   ssh_interface                         = "private_ip"
-  subnet_id                             = "subnet-04d911e4b55853ef7"
+  subnet_id                             = "subnet-078043a467c391dfd"
   tags                                  = { Name = "UIFCW-Cluster-${local.now}" }
   temporary_security_group_source_cidrs = var.aws_temporary_security_group_source_cidrs
 }
@@ -144,7 +144,7 @@ build {
   }
 
   provisioner "shell" {
-    execute_command = "{{ .Vars }} sudo -E '{{ .Path }}'"
+    execute_command = "sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     script          = "${path.root}/da-cluster-start-script.sh"
     valid_exit_codes = [0,1,2]
   }

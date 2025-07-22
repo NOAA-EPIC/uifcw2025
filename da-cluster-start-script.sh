@@ -44,7 +44,8 @@ spack compiler find
 spack compiler rm gcc@12.3.0
 spack install intel-oneapi-compilers@2024.2.1
 spack install intel-oneapi-mpi@2021.14.0
-spack compiler add `spack location -i intel-oneapi-compilers`/opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-*/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-*/compiler/latest/bin
+export ONEAPIPATH=`ls -ld /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-*/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-*/compiler/latest/bin/`
+spack compiler add `spack location -i intel-oneapi-compilers` $ONEAPIPATH
 spack stack create env --site linux.default --template unified-dev --name ue-oneapi-2024.2.1 --compiler oneapi 
 tee /opt/spack-stack/envs/ue-oneapi-2024.2.1/spack.yaml <<EOF
 # spack-stack hash: 261cfcc
@@ -69,8 +70,8 @@ spack:
     - esmf@=8.8.0 snapshot=none
   specs:
   - matrix:
-    - [$packages]
-    - [$compilers]
+    - [\$packages]
+    - [\$compilers]
     exclude:
     # Don't build ai-env and jedi-tools-env with Intel or oneAPI,
     # some packages don't build (e.g., py-torch in ai-env doesn't
@@ -90,14 +91,14 @@ spack:
         - gcc@=11.4.0
   bootstrap:
     enable: true
-    root: $spack/bootstrap
+    root: \$spack/bootstrap
     sources:
     - name: github-actions-v0.6
-      metadata: $spack/share/spack/bootstrap/github-actions-v0.6
+      metadata: \$spack/share/spack/bootstrap/github-actions-v0.6
     - name: github-actions-v0.5
-      metadata: $spack/share/spack/bootstrap/github-actions-v0.5
+      metadata: \$spack/share/spack/bootstrap/github-actions-v0.5
     - name: spack-install
-      metadata: $spack/share/spack/bootstrap/spack-install
+      metadata: \$spack/share/spack/bootstrap/spack-install
     trusted:
     # By default we trust bootstrapping from sources and from binaries
     # produced on Github via the workflow
@@ -108,8 +109,6 @@ EOF
 
 cd /opt/spack-stack/envs/ue-oneapi-2024.2.1
 spack env activate -p .
-cd /opt/spack-stack
-. ./setup.sh 
 spack concretize 2>&1 | tee log.concretize
 spack install --verbose --fail-fast --show-log-on-error --no-check-signature 2>&1 | tee log.install
 tee /opt/spack-stack/envs/ue-oneapi-2024.2.1/site/modules.yaml <<EOF1
@@ -125,10 +124,5 @@ modules:
       - python
 EOF1
 
-cp /root/.spack/linux/compilers.yaml /opt/spack-stack/envs/ue-oneapi-2024.2.1/site 
-cd /opt/spack-stack
-. ./setup.sh && source /usr/share/lmod/lmod/init/bash
-cd /opt/spack-stack/envs/ue-oneapi-2024.2.1
-spack env activate -p .
 spack module lmod refresh -y
 spack stack setup-meta-modules
