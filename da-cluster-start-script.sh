@@ -43,7 +43,7 @@ cd spack-stack
 spack compiler find
 spack compiler rm gcc@12.3.0
 spack install intel-oneapi-compilers@2024.2.1
-spack install intel-oneapi-mpi@2021.13.1
+spack install intel-oneapi-mpi@2021.13
 export ONEAPIPATH=`ls -ld /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-*/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-*`
 export ONEAPIMPIPATH=`ls -ld /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-*/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-*`
 spack compiler add `spack location -i intel-oneapi-compilers` $ONEAPIPATH/compiler/latest/bin/
@@ -187,9 +187,9 @@ packages:
   intel-oneapi-mpi:
     buildable: False
     externals:
-    - spec: intel-oneapi-mpi@2021.13.1
+    - spec: intel-oneapi-mpi@2021.13
       modules:
-      - intel-oneapi-mpi/2021.13.1
+      - intel-oneapi-mpi/2021.13
       environment:
       prepend_path:
         MODULEPATH: '/opt/modulefiles'
