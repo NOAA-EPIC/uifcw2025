@@ -44,18 +44,19 @@ spack compiler find
 spack compiler rm gcc@12.3.0
 spack install intel-oneapi-compilers@2024.2.1
 spack install intel-oneapi-mpi@2021.13.1
-export ONEAPIPATH=`ls -ld /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-*/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-*/compiler/latest/bin/`
-spack compiler add `spack location -i intel-oneapi-compilers` $ONEAPIPATH
+export ONEAPIPATH=`ls -ld /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-*/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-*`
+export ONEAPIMPIPATH=`ls -ld /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-*/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-*`
+spack compiler add `spack location -i intel-oneapi-compilers` $ONEAPIPATH/compiler/latest/bin/
 
 tee /opt/spack-stack/configs/sites/tier2/linux.default/compilers.yaml <<EOF
 compilers:
 - compiler:
     spec: oneapi@2024.2.1
     paths:
-      cc: /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-sapphirerapids/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-j3owv3rsoh7igqvwmvp7ez6i3ozeayvs/compiler/latest/bin/icx
-      cxx: /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-sapphirerapids/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-j3owv3rsoh7igqvwmvp7ez6i3ozeayvs/compiler/latest/bin/icpx
-      f77: /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-sapphirerapids/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-j3owv3rsoh7igqvwmvp7ez6i3ozeayvs/compiler/latest/bin/ifort
-      fc: /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-sapphirerapids/gcc-11.4.0/intel-oneapi-compilers-2024.2.1-j3owv3rsoh7igqvwmvp7ez6i3ozeayvs/compiler/latest/bin/ifort
+      cc: ${ONEAPIPATH}/compiler/latest/bin/icx
+      cxx: ${ONEAPIPATH}/compiler/latest/bin/icpx
+      f77: ${ONEAPIPATH}/compiler/latest/bin/ifort 
+      fc: ${ONEAPIPATH}/compiler/latest/bin/ifort 
     flags: {}
     operating_system: ubuntu22.04
     target: x86_64
@@ -192,7 +193,7 @@ packages:
       environment:
       prepend_path:
         MODULEPATH: '/opt/modulefiles'
-      prefix: /opt/spack-stack/spack/opt/spack/linux-ubuntu22.04-sapphirerapids/gcc-11.4.0/intel-oneapi-mpi-2021.13.1-5l7irsoye6le4sudsuovujk4k4i47hwe
+      prefix: ${ONEAPIMPIPATH} 
       
   ectrans:
     require::
@@ -226,15 +227,18 @@ spack:
   - compilers:
     - '%oneapi'
   - packages:
-    - ufs-srw-app-env       ^esmf@=8.8.0 ^crtm@=3.1.1-build1
-    - ufs-weather-model-env ^esmf@=8.8.0 ^crtm@=3.1.1-build1
-    - crtm@3.1.1-build1
-    - mapl@2.53.4 ^esmf@8.8.0
-    - esmf@=8.8.0 snapshot=none
+     - global-workflow-env   ^esmf@=8.6.1 ^crtm@=3.1.1-build1
+     - ufs-srw-app-env       ^esmf@=8.8.0
+     - ufs-weather-model-env ^esmf@=8.8.0
+     - crtm@2.4.0.1
+     - mapl@2.53.4 ^esmf@8.8.0
+     - esmf@=8.8.0 snapshot=none
+     - madis@4.5
+     - sp@2.5.0
   specs:
   - matrix:
-    - [\$packages]
-    - [\$compilers]
+    - [$packages]
+    - [$compilers]
     exclude:
     # Don't build ai-env and jedi-tools-env with Intel or oneAPI,
     # some packages don't build (e.g., py-torch in ai-env doesn't
@@ -247,27 +251,8 @@ spack:
   packages:
     all:
       prefer: ['%oneapi']
-  modules:
-    default:
-      lmod:
-        core_compilers:
-        - gcc@=11.4.0
-  bootstrap:
-    enable: true
-    root: \$spack/bootstrap
-    sources:
-    - name: github-actions-v0.6
-      metadata: \$spack/share/spack/bootstrap/github-actions-v0.6
-    - name: github-actions-v0.5
-      metadata: \$spack/share/spack/bootstrap/github-actions-v0.5
-    - name: spack-install
-      metadata: \$spack/share/spack/bootstrap/spack-install
-    trusted:
-    # By default we trust bootstrapping from sources and from binaries
-    # produced on Github via the workflow
-      github-actions-v0.6: true
-      github-actions-v0.5: true
-      spack-install: true
+      providers:
+        mpi: [intel-oneapi-mpi]
 EOF
 
 cd /opt/spack-stack/envs/ue-oneapi-2024.2.1
