@@ -1,6 +1,7 @@
 #!/bin/bash
 mkdir -p /opt/build 
 mkdir -p /opt/dist
+mkdir -p /opt/modulefiles
 DEBIAN_FRONTEND=noninteractive apt-get update -yq --allow-unauthenticated 
 DEBIAN_FRONTEND=noninteractive apt-get -yq upgrade
 DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ gfortran gdb
