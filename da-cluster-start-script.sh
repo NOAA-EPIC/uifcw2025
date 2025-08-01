@@ -1,7 +1,9 @@
 #!/bin/bash
 mkdir -p /opt/build 
 mkdir -p /opt/dist
-mkdir -p /opt/modulefiles
+mkdir -p /opt/modulefiles/intel-oneapi
+mkdir -p /opt/modulefiles/intel-oneapi-mpi
+
 DEBIAN_FRONTEND=noninteractive apt-get update -yq --allow-unauthenticated 
 DEBIAN_FRONTEND=noninteractive apt-get -yq upgrade
 DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ gfortran gdb
@@ -228,13 +230,11 @@ spack:
   - compilers:
     - '%oneapi'
   - packages:
-     - global-workflow-env   ^esmf@=8.6.1 ^crtm@=3.1.1-build1
      - ufs-srw-app-env       ^esmf@=8.8.0
      - ufs-weather-model-env ^esmf@=8.8.0
      - crtm@2.4.0.1
      - mapl@2.53.4 ^esmf@8.8.0
      - esmf@=8.8.0 snapshot=none
-     - madis@4.5
      - sp@2.5.0
   specs:
   - matrix:
@@ -263,3 +263,89 @@ spack install --verbose --fail-fast --show-log-on-error --no-check-signature 2>&
 
 spack module lmod refresh -y
 spack stack setup-meta-modules
+
+tee /opt/modulefiles/intel-oneapi/2024.2.1.lua <<EOF
+whatis([[Name : intel-oneapi-compilers]])
+whatis([[Version : 2024.2.1]])
+whatis([[Target : x86_64]])
+whatis([[Short description : Intel oneAPI Compilers. Includes: icx, icpx, ifx, and ifort. Releases before 2024.0 include icc/icpc LICENSE INFORMATION: By downloading and using this software, you agree to the terms and conditions of the software license agreements at https://intel.ly/393CijO.]])
+
+help([[Name   : intel-oneapi-compilers]])
+help([[Version: 2024.2.1]])
+help([[Target : x86_64]])
+help()
+help([[Intel oneAPI Compilers. Includes: icx, icpx, ifx, and ifort. Releases
+before 2024.0 include icc/icpc LICENSE INFORMATION: By downloading and
+using this software, you agree to the terms and conditions of the
+software license agreements at https://intel.ly/393CijO.]])
+
+family("compiler")
+
+-- Loading this module unlocks the path below unconditionally
+--prepend_path("MODULEPATH", "/apps/spack-2024-12/modules/linux-rocky9-x86_64/oneapi/2024.2.1")
+
+prepend_path("CMAKE_PREFIX_PATH", "${ONEAPIPATH}/.", ":")
+prepend_path("CMAKE_PREFIX_PATH", "${ONEAPIPATH}/compiler/2024.2", ":")
+setenv("CMPLR_ROOT", "${ONEAPIPATH}/compiler/2024.2")
+prepend_path("DIAGUTIL_PATH", "/apps/spack-2024-12/linux-rocky9-x86_64/gcc-11.4.1/intel-oneapi-compilers-2024.2.1-oqhstbmawnrsdw472p4pjsopj547o6xs/compiler/2024.2/etc/compiler/sys_check/sys_check.sh", ":")
+prepend_path("DIAGUTIL_PATH", "${ONEAPIPATH}/compiler/2024.2/etc/compiler/sys_check/sys_check.sh", ":")
+prepend_path("LD_LIBRARY_PATH", "/apps/spack-2024-12/linux-rocky9-x86_64/gcc-11.4.1/intel-oneapi-compilers-2024.2.1-oqhstbmawnrsdw472p4pjsopj547o6xs/compiler/2024.2/opt/compiler/lib:/apps/spack-2024-12/linux-rocky9-x86_64/gcc-11.4.1/intel-oneapi-compilers-2024.2.1-oqhstbmawnrsdw472p4pjsopj547o6xs/compiler/2024.2/lib", ":")
+prepend_path("LD_LIBRARY_PATH", "${ONEAPIPATH}/compiler/2024.2/opt/compiler/lib:${ONEAPIPATH}/compiler/2024.2/lib", ":")
+prepend_path("PKG_CONFIG_PATH", "${ONEAPIPATH}/compiler/2024.2/lib/pkgconfig", ":")
+prepend_path("MANPATH", "${ONEAPIPATH}/compiler/2024.2/share/man:/usr/share/man", ":")
+prepend_path("PATH", "${ONEAPIPATH}/compiler/2024.2/bin", ":")
+
+
+setenv("F77", "${ONEAPIPATH}/compiler/latest/bin/ifort")
+setenv("FC",  "${ONEAPIPATH}/compiler/latest/bin/ifort")
+setenv("CC",  "${ONEAPIPATH}/compiler/latest/bin/icx")
+setenv("CXX", "${ONEAPIPATH}/compiler/latest/bin/icpx")
+setenv("SERIAL_F77", "${ONEAPIPATH}/compiler/latest/bin/ifort")
+setenv("SERIAL_FC",  "${ONEAPIPATH}/compiler/latest/bin/ifort")
+setenv("SERIAL_CC",  "${ONEAPIPATH}/compiler/latest/bin/icx")
+setenv("SERIAL_CXX", "${ONEAPIPATH}/compiler/latest/bin/icpx")
+
+setenv("INTEL_ONEAPI_COMPILERS_ROOT", "${ONEAPIPATH}")
+append_path("MANPATH", "", ":")
+
+EOF
+
+tee /opt/modulefiles/intel-oneapi-mpi/2021.13.lua <<EOF
+whatis("Name : intel-oneapi-mpi")
+whatis("Version : 2021.13.1")
+whatis("Target : x86_64")
+whatis("Short description : Intel MPI Library is a multifabric message-passing library that implements the open-source MPICH specification. Use the library to create, maintain, and test advanced, complex applications that perform better on high-performance computing (HPC) clusters based on Intel processors.")
+help([[Intel MPI Library is a multifabric message-passing library that
+implements the open-source MPICH specification. Use the library to
+create, maintain, and test advanced, complex applications that perform
+better on high-performance computing (HPC) clusters based on Intel
+processors. LICENSE INFORMATION: By downloading and using this software,
+you agree to the terms and conditions of the software license agreements
+at https://intel.ly/393CijO.]])
+
+family("mpi")
+
+prepend_path("CMAKE_PREFIX_PATH","${ONEAPIMPIPATH}/.")
+prepend_path("CLASSPATH","${ONEAPIMPIPATH}/mpi/2021.13/share/java/mpi.jar")
+prepend_path("CPATH","${ONEAPIMPIPATH}/mpi/2021.13/include")
+prepend_path("FI_PROVIDER_PATH","${ONEAPIMPIPATH}/mpi/2021.13/opt/mpi/libfabric/lib:/usr/lib64/libfabric")
+setenv("I_MPI_ROOT","${ONEAPIMPIPATH}/mpi/2021.13")
+prepend_path("LD_LIBRARY_PATH","${ONEAPIMPIPATH}/mpi/2021.13/opt/mpi/libfabric/lib:${ONEAPIMPIPATH}/mpi/2021.13/lib")
+prepend_path("LIBRARY_PATH","${ONEAPIMPIPATH}/mpi/2021.13/lib")
+prepend_path("PKG_CONFIG_PATH","${ONEAPIMPIPATH}/mpi/2021.13/lib/pkgconfig")
+prepend_path("MANPATH","${ONEAPIMPIPATH}/mpi/2021.13/share/man:/apps/slurm/default/share/man:/apps/lmod/lmod/share/man::/apps/local/man:/usr/share/man")
+prepend_path("PATH","${ONEAPIMPIPATH}/mpi/2021.13/bin")
+setenv("INTEL_ONEAPI_MPI_ROOT","${ONEAPIMPIPATH}")
+append_path("MANPATH","")
+
+EOF
+
+su - ubuntu <<'EOF'
+
+cd /home/ubuntu
+
+wget https://noaa-ufs-htf-pds.s3.amazonaws.com/develop-20250530/HSD_fix_files_and_case_data.tar.gz
+
+tar -vxzf HSD_fix_files_and_case_data.tar.gz
+
+EOF
