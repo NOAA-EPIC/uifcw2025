@@ -238,8 +238,8 @@ spack:
      - sp@2.5.0
   specs:
   - matrix:
-    - [$packages]
-    - [$compilers]
+    - [$\packages]
+    - [$\compilers]
     exclude:
     # Don't build ai-env and jedi-tools-env with Intel or oneAPI,
     # some packages don't build (e.g., py-torch in ai-env doesn't
