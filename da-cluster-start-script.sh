@@ -23,6 +23,8 @@ DEBIAN_FRONTEND=noninteractive apt install -y libssl-dev
 DEBIAN_FRONTEND=noninteractive apt install -y lua5.3
 DEBIAN_FRONTEND=noninteractive apt install -y liblua5.3-dev
 DEBIAN_FRONTEND=noninteractive apt install -y lua-posix
+DEBIAN_FRONTEND=noninteractive apt install -y grads 
+DEBIAN_FRONTEND=noninteractive apt install -y ruby-full
 
 # install cmake
 cd /opt/build 
@@ -284,6 +286,7 @@ family("compiler")
 -- Loading this module unlocks the path below unconditionally
 --prepend_path("MODULEPATH", "/apps/spack-2024-12/modules/linux-rocky9-x86_64/oneapi/2024.2.1")
 
+prepend_path("MODULEPATH", "opt/modulefiles")
 prepend_path("CMAKE_PREFIX_PATH", "${ONEAPIPATH}/.", ":")
 prepend_path("CMAKE_PREFIX_PATH", "${ONEAPIPATH}/compiler/2024.2", ":")
 setenv("CMPLR_ROOT", "${ONEAPIPATH}/compiler/2024.2")
@@ -325,6 +328,7 @@ at https://intel.ly/393CijO.]])
 
 family("mpi")
 
+prepend_path("MODULEPATH", "opt/modulefiles")
 prepend_path("CMAKE_PREFIX_PATH","${ONEAPIMPIPATH}/.")
 prepend_path("CLASSPATH","${ONEAPIMPIPATH}/mpi/2021.13/share/java/mpi.jar")
 prepend_path("CPATH","${ONEAPIMPIPATH}/mpi/2021.13/include")
@@ -342,7 +346,16 @@ EOF
 
 su - ubuntu <<'EOF'
 
+sudo gem install sqlite3
+sudo gem install thread
+sudo gem install pool
+
+git clone https://github.com/christopherwharrop/rocoto.git
+cd rocoto/
+./INSTALL
+
 cd /home/ubuntu
+
 
 wget https://noaa-ufs-htf-pds.s3.amazonaws.com/develop-20250530/HSD_fix_files_and_case_data.tar.gz
 
