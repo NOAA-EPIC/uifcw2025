@@ -346,6 +346,7 @@ EOF
 
 su - ubuntu <<'EOF'
 
+
 sudo gem install sqlite3
 sudo gem install thread
 sudo gem install pool
@@ -356,6 +357,10 @@ cd rocoto/
 
 cd /home/ubuntu
 
+echo 'export PATH="$PATH:/home/ubuntu/rocoto/bin"' >> .bashrc
+echo 'module use /opt/modulefiles' >> .bashrc
+echo 'module use /opt/spack-stack/envs/ue-oneapi-2024.2.1/install/modulefiles/Core' >> .bashrc
+echo 'module use /opt/spack-stack/envs/ue-oneapi-2024.2.1/install/modulefiles/intel-oneapi-mpi/2021.13-dsdmcwn/gcc/11.4.0' >> .bashrc
 
 wget https://noaa-ufs-htf-pds.s3.amazonaws.com/develop-20250530/HSD_fix_files_and_case_data.tar.gz
 
