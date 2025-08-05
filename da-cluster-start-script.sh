@@ -214,57 +214,6 @@ packages:
       '%gcc'
 EOF
 
-spack stack create env --site linux.default --template unified-dev --name ue-oneapi-2024.2.1 --compiler oneapi 
-tee /opt/spack-stack/envs/ue-oneapi-2024.2.1/spack.yaml <<EOF
-# spack-stack hash: 261cfcc
-# spack hash: f1be100187
-spack:
-  concretizer:
-    unify: when_possible
-
-  view: false
-  include:
-  - site
-  - common
-
-  definitions:
-  - compilers:
-    - '%oneapi'
-  - packages:
-     - ufs-srw-app-env       ^esmf@=8.8.0
-     - ufs-weather-model-env ^esmf@=8.8.0
-     - crtm@2.4.0.1
-     - mapl@2.53.4 ^esmf@8.8.0
-     - esmf@=8.8.0 snapshot=none
-     - sp@2.5.0
-  specs:
-  - matrix:
-    - [\$packages]
-    - [\$compilers]
-    exclude:
-    # Don't build ai-env and jedi-tools-env with Intel or oneAPI,
-    # some packages don't build (e.g., py-torch in ai-env doesn't
-    # build with Intel, and there are constant problems concretizing
-    # the environment
-    - ai-env%intel
-    - ai-env%oneapi
-    - jedi-tools-env%intel
-    - jedi-tools-env%oneapi
-  packages:
-    all:
-      prefer: ['%oneapi']
-      providers:
-        mpi: [intel-oneapi-mpi]
-EOF
-
-cd /opt/spack-stack/envs/ue-oneapi-2024.2.1
-spack env activate -p .
-spack concretize 2>&1 | tee log.concretize
-spack install --verbose --fail-fast --show-log-on-error --no-check-signature 2>&1 | tee log.install
-
-spack module lmod refresh -y
-spack stack setup-meta-modules
-
 tee /opt/modulefiles/intel-oneapi/2024.2.1.lua <<EOF
 whatis([[Name : intel-oneapi-compilers]])
 whatis([[Version : 2024.2.1]])
@@ -356,6 +305,58 @@ prepend_path("PATH","/home/ubuntu/rocoto/bin")
 prepend_path("LD_LIBRARY_PATH","/home/ubuntu/rocoto/lib")
 
 EOF
+
+spack stack create env --site linux.default --template unified-dev --name ue-oneapi-2024.2.1 --compiler oneapi 
+tee /opt/spack-stack/envs/ue-oneapi-2024.2.1/spack.yaml <<EOF
+# spack-stack hash: 261cfcc
+# spack hash: f1be100187
+spack:
+  concretizer:
+    unify: when_possible
+
+  view: false
+  include:
+  - site
+  - common
+
+  definitions:
+  - compilers:
+    - '%oneapi'
+  - packages:
+     - ufs-srw-app-env       ^esmf@=8.8.0
+     - ufs-weather-model-env ^esmf@=8.8.0
+     - crtm@2.4.0.1
+     - mapl@2.53.4 ^esmf@8.8.0
+     - esmf@=8.8.0 snapshot=none
+     - sp@2.5.0
+  specs:
+  - matrix:
+    - [\$packages]
+    - [\$compilers]
+    exclude:
+    # Don't build ai-env and jedi-tools-env with Intel or oneAPI,
+    # some packages don't build (e.g., py-torch in ai-env doesn't
+    # build with Intel, and there are constant problems concretizing
+    # the environment
+    - ai-env%intel
+    - ai-env%oneapi
+    - jedi-tools-env%intel
+    - jedi-tools-env%oneapi
+  packages:
+    all:
+      prefer: ['%oneapi']
+      providers:
+        mpi: [intel-oneapi-mpi]
+EOF
+
+cd /opt/spack-stack/envs/ue-oneapi-2024.2.1
+spack env activate -p .
+spack concretize 2>&1 | tee log.concretize
+spack install --verbose --fail-fast --show-log-on-error --no-check-signature 2>&1 | tee log.install
+
+spack module lmod refresh -y
+spack stack setup-meta-modules
+
 
 ### Add Grads and Ruby
 DEBIAN_FRONTEND=noninteractive apt-get update -yq --allow-unauthenticated 
