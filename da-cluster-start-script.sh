@@ -23,8 +23,6 @@ DEBIAN_FRONTEND=noninteractive apt install -y libssl-dev
 DEBIAN_FRONTEND=noninteractive apt install -y lua5.3
 DEBIAN_FRONTEND=noninteractive apt install -y liblua5.3-dev
 DEBIAN_FRONTEND=noninteractive apt install -y lua-posix
-DEBIAN_FRONTEND=noninteractive apt install -y grads 
-DEBIAN_FRONTEND=noninteractive apt install -y ruby-full
 
 # install cmake
 cd /opt/build 
@@ -344,6 +342,11 @@ append_path("MANPATH","")
 
 EOF
 
+### Add Grads and Ruby
+DEBIAN_FRONTEND=noninteractive apt-get update -yq --allow-unauthenticated 
+DEBIAN_FRONTEND=noninteractive apt install -y grads 
+DEBIAN_FRONTEND=noninteractive apt install -y ruby-full
+
 su - ubuntu <<'EOF'
 
 
@@ -365,5 +368,8 @@ echo 'module use /opt/spack-stack/envs/ue-oneapi-2024.2.1/install/modulefiles/in
 wget https://noaa-ufs-htf-pds.s3.amazonaws.com/develop-20250530/HSD_fix_files_and_case_data.tar.gz
 
 tar -vxzf HSD_fix_files_and_case_data.tar.gz
+
+mkdir -p /home/ubuntu/UFS-WM_RT
+mv /home/ubuntu/HSD_cases_data/NEMSfv3gfs /home/ubuntu/UFS-WM_RT
 
 EOF
