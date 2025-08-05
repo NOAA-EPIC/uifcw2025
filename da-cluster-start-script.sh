@@ -284,7 +284,7 @@ family("compiler")
 -- Loading this module unlocks the path below unconditionally
 --prepend_path("MODULEPATH", "/apps/spack-2024-12/modules/linux-rocky9-x86_64/oneapi/2024.2.1")
 
-prepend_path("MODULEPATH", "opt/modulefiles")
+prepend_path("MODULEPATH", "/opt/modulefiles")
 prepend_path("CMAKE_PREFIX_PATH", "${ONEAPIPATH}/.", ":")
 prepend_path("CMAKE_PREFIX_PATH", "${ONEAPIPATH}/compiler/2024.2", ":")
 setenv("CMPLR_ROOT", "${ONEAPIPATH}/compiler/2024.2")
@@ -326,7 +326,7 @@ at https://intel.ly/393CijO.]])
 
 family("mpi")
 
-prepend_path("MODULEPATH", "opt/modulefiles")
+prepend_path("MODULEPATH", "/opt/modulefiles")
 prepend_path("CMAKE_PREFIX_PATH","${ONEAPIMPIPATH}/.")
 prepend_path("CLASSPATH","${ONEAPIMPIPATH}/mpi/2021.13/share/java/mpi.jar")
 prepend_path("CPATH","${ONEAPIMPIPATH}/mpi/2021.13/include")
