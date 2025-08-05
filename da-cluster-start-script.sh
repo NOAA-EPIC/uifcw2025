@@ -3,6 +3,7 @@ mkdir -p /opt/build
 mkdir -p /opt/dist
 mkdir -p /opt/modulefiles/intel-oneapi
 mkdir -p /opt/modulefiles/intel-oneapi-mpi
+mkdir -p /opt/modulefiles/rocoto
 
 DEBIAN_FRONTEND=noninteractive apt-get update -yq --allow-unauthenticated 
 DEBIAN_FRONTEND=noninteractive apt-get -yq upgrade
@@ -339,6 +340,20 @@ prepend_path("MANPATH","${ONEAPIMPIPATH}/mpi/2021.13/share/man:/apps/slurm/defau
 prepend_path("PATH","${ONEAPIMPIPATH}/mpi/2021.13/bin")
 setenv("INTEL_ONEAPI_MPI_ROOT","${ONEAPIMPIPATH}")
 append_path("MANPATH","")
+
+EOF
+
+tee /opt/modulefiles/rocoto/1.3.7.lua <<EOF
+help([[
+  Set environment variables for rocoto workflow manager)
+]])
+
+-- Make sure another version of the same package is not already loaded
+conflict("rocoto")
+
+-- Set environment variables
+prepend_path("PATH","/home/ubuntu/rocoto/bin")
+prepend_path("LD_LIBRARY_PATH","/home/ubuntu/rocoto/lib")
 
 EOF
 
