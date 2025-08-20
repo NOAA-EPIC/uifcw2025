@@ -409,8 +409,8 @@ cd /home/ubuntu/UFS-WM_RT/NEMSfv3gfs/input-data-20240501/HSD_input_data/tropical
 curl -O https://raw.githubusercontent.com/NOAA-EPIC/ufs-weather-model/refs/heads/feature/HSD_training/tests-dev/test_cases/parm/fd_ufs.tc.yaml
 
 mkdir -p /home/ubuntu/UFS-WM_RT/NEMSfv3gfs/input-data-20240501/HSD_input_data/2020072400
-
-##TODO add the data for this.
-
+cd /home/ubuntu/UFS-WM_RT/NEMSfv3gfs/input-data-20240501/HSD_input_data/2020072400
+wget https://s3.us-east-1.amazonaws.com/epic.sandbox.content/gfs-pgrb2.tar.gz 
+tar -vxzf gfs-pgrb2.tar.gz 
 
 EOF
