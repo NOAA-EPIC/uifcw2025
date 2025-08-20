@@ -357,10 +357,26 @@ spack install --verbose --fail-fast --show-log-on-error --no-check-signature 2>&
 spack module lmod refresh -y
 spack stack setup-meta-modules
 
+### Add Grads
+cd /opt
+git clone --depth=2 https://github.com/spack/spack.git
+. spack/share/spack/setup-env.sh
+cd spack
+spack install grads 2>&1 | tee log.install_grads.001
 
-### Add Grads and Ruby
+cd /opt/modulefiles
+mkdir grads
+cd grads
+curl -O https://raw.githubusercontent.com/ulmononian/ihaul/refs/heads/main/2.2.3.lua
+
+## Add ImgCAT
+cd /opt
+curl -O https://iterm2.com/utilities/imgcat
+chmod +x imgcat
+sudo mv imgcat /usr/local/bin/
+
+### Add Ruby
 DEBIAN_FRONTEND=noninteractive apt-get update -yq --allow-unauthenticated 
-DEBIAN_FRONTEND=noninteractive apt install -y grads 
 DEBIAN_FRONTEND=noninteractive apt install -y ruby-full
 
 su - ubuntu <<'EOF'
@@ -387,5 +403,14 @@ tar -vxzf HSD_fix_files_and_case_data.tar.gz
 
 mkdir -p /home/ubuntu/UFS-WM_RT
 mv /home/ubuntu/HSD_cases_data/NEMSfv3gfs /home/ubuntu/UFS-WM_RT
+
+cd /home/ubuntu/UFS-WM_RT/NEMSfv3gfs/input-data-20240501/HSD_input_data/tropical_cyclone/fix
+
+curl -O https://raw.githubusercontent.com/NOAA-EPIC/ufs-weather-model/refs/heads/feature/HSD_training/tests-dev/test_cases/parm/fd_ufs.tc.yaml
+
+mkdir -p /home/ubuntu/UFS-WM_RT/NEMSfv3gfs/input-data-20240501/HSD_input_data/2020072400
+
+##TODO add the data for this.
+
 
 EOF

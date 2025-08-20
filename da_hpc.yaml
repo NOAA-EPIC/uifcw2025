@@ -1,7 +1,7 @@
 Region: us-east-1
 Image:
   Os: ubuntu2204 
-  CustomAmi: ami-09ffa206d48e804ac 
+  CustomAmi: ami-0d0ec6a4cafca5488 
 HeadNode:
   InstanceType: c7i.2xlarge
   Networking:
@@ -27,7 +27,7 @@ Scheduling:
       Instances:
       - InstanceType: c7i.24xlarge
       MinCount: 0
-      MaxCount: 2
+      MaxCount: 10 
       Efa:
         Enabled: false 
     Networking:
