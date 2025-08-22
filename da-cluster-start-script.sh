@@ -357,6 +357,8 @@ spack install --verbose --fail-fast --show-log-on-error --no-check-signature 2>&
 spack module lmod refresh -y
 spack stack setup-meta-modules
 
+spack env deactivate
+
 ### Add Grads
 cd /opt
 git clone --depth=2 https://github.com/spack/spack.git
