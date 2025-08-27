@@ -27,8 +27,8 @@ When prompted for a passphrase, press return/enter twice and leave blank.
 This should generate a public/private key pair in the user's home `.ssh` directory.
 
 ```
-Your identification has been saved in /Users/gpetro/.ssh/id_ed25519_student3
-Your public key has been saved in /Users/gpetro/.ssh/id_ed25519_student3.pub
+Your identification has been saved in /Users/gpetro/.ssh/id_ed25519
+Your public key has been saved in /Users/gpetro/.ssh/id_ed25519.pub
 The key fingerprint is:
 SHA256:GhEIm283dy9n5vAzdkaPfQ3g7z5C6wLOIRFzF8wYYjo gpetro@gpetro-MacBook-Pro
 The key's randomart image is:
@@ -79,7 +79,7 @@ Next, add the newly generated key to your laptop’s identity by issuing the com
 ssh-add /User/<username>/.ssh/id_ed25519
 ```
 
-where `username` is replaced with your actual username, and `(n)` is replaced by your assigned student number. 
+where `username` is replaced with your actual username. 
 
 If successful, you should see a message similar to the following:
 
