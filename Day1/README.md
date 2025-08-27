@@ -10,16 +10,16 @@ A Secure SHell (SSH) tunnel creates an encrypted connection between two computer
 Open the MacOS terminal application and type the following commands to generate a public/private key pair on your local system: 
 
 ```
-ssh-keygen -t ed25519 -f /Users/<username>/.ssh/id_ed25519_student{1-30} 
+ssh-keygen -t ed25519 -f /Users/<username>/.ssh/id_ed25519 
 ```
 
-where `username` is replaced with your actual username, and `{1-30}` is replaced with your assigned number. 
+where `username` is replaced with your actual username. 
 
 The output from the command should look like the following lines except that username is replaced with your username:
 
 ```
 Generating public/private ed25519 key pair.
-Enter passphrase for "/Users/gpetro/.ssh/id_ed25519_student3" (empty for no passphrase): 
+Enter passphrase for "/Users/gpetro/.ssh/id_ed25519" (empty for no passphrase): 
 Enter same passphrase again:
 ```
 
@@ -50,11 +50,11 @@ Use a text editor of your choice to view the public key file in the user's home 
 
 For example:
 ```
-vim /Users/<username>/.ssh/id_ed25519_student(n).pub
+vim /Users/<username>/.ssh/id_ed25519.pub
 ```
 (when using vim, press `:q` to quit the editor)
 
-Copy and paste the contents of the public key to the workshop administrator via the Slack workspace channel `#cadre-epic-data-assimilation-training` and inform them of which student number you were assigned (i.e., student 5).  
+Copy and paste the contents of the public key to the workshop administrator via the Slack workspace channel `#uifcw25-training-3-intro-to-running-idealized-test-cases-via-ufs-hsd-framework`.  
 
 NOTE: There will be 2 keys generated, a public and a private key. DO NOT SEND THE PRIVATE KEY! A public key (the correct one) will end in `.pub` and will start like this: 
 
@@ -76,7 +76,7 @@ The workshop administrators will add the **public** key to the authorization fil
 Next, add the newly generated key to your laptop’s identity by issuing the command: 
 
 ```
-ssh-add /User/<username>/.ssh/id_ed25519_student(n)
+ssh-add /User/<username>/.ssh/id_ed25519
 ```
 
 where `username` is replaced with your actual username, and `(n)` is replaced by your assigned student number. 
@@ -84,16 +84,16 @@ where `username` is replaced with your actual username, and `(n)` is replaced by
 If successful, you should see a message similar to the following:
 
 ```
-Identity added: /Users/<username>/.ssh/id_ed25519_student5 (username@MacBook-Pro.local)
+Identity added: /Users/<username>/.ssh/id_ed25519 (username@MacBook-Pro.local)
 ```
 
 Now you may access the HPC environment through the bastion host proxy by issuing the command below in the terminal (again replacing `(n)` with your assigned student number): 
 
 ```
-ssh student(n)@137.75.93.46
+ssh student(n)@jump.epic.noaa.gov
 ```
 
-You should be automatically redirected through the bastion proxy to the controller node of your HPC environment. If you run the `ls` command, you will see the Land DA container (`.img`) file, the `inputs` data directory, and a `rocoto` directory.  
+You should be automatically redirected through the bastion proxy to the controller node of your HPC environment.  
 
 
 ### Instructions for Windows Users
@@ -142,7 +142,7 @@ Use a text editor of your choice to view the public key file or view it in the c
 type /Users/<username>/.ssh/id_ed25519_student(n).pub
 ```
 
-Copy-paste the public key contents to the workshop administrator via the Slack workspace channel `#cadre-epic-data-assimilation-training` and inform them of your student number (i.e., student 5).
+Copy-paste the public key contents to the workshop administrator via the Slack workspace channel `#uifcw25-training-3-intro-to-running-idealized-test-cases-via-ufs-hsd-framework`.
 NOTE: Two (2) keys are generated: a public and a private key. DO NOT SEND THE PRIVATE KEY! 
 A public key will end in `.pub` and will start something like this: 
 ```
@@ -164,7 +164,7 @@ https://learn.microsoft.com/en-us/windows/terminal/tutorials/ssh
 
 Access the HPC environment using Windows Powershell or Command Prompt through the bastion host proxy by issuing the command below: 
 ```
-ssh -i C:\Users\<User>/.ssh/id_ecdsa student(n)@137.75.93.46
+ssh -i C:\Users\<User>/.ssh/id_ecdsa student(n)@jump.epic.noaa.gov
 ```
 where `C:\Users\<User>/.ssh/` is replaced with the path to the `id_ecdsa` file on the user’s system.
 
@@ -174,4 +174,4 @@ The user may see a message asking whether the user wants to continue connecting.
 Verify that you are connecting to the correct system and enter `yes` to continue.
 
 This should automatically redirect users through the bastion proxy to the controller node of their HPC environment. 
-If you run the `ls` command, you will see the Land DA container (`.img`) file, the `inputs` data directory, and a `rocoto` directory: 
+
