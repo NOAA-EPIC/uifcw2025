@@ -1,4 +1,4 @@
-# da-training
+# HSD-training
 
 
 ## Connecting to an HPC Environment via SSH
