@@ -256,4 +256,3 @@ cd /scratch/<username>/RT_RUNDIRS/root/FV3_RT/rt_<rt_number>
 cp /scratch/<user>/ufs-weather-model/tests-dev/test_cases/utils/plot_tc.sh .
 ./plot_tc.sh
 imgcat *.png
-```
