@@ -175,3 +175,85 @@ Verify that you are connecting to the correct system and enter `yes` to continue
 
 This should automatically redirect users through the bastion proxy to the controller node of their HPC environment. 
 
+```
+ssh student[N]@jump.epic.noaa.gov
+cd /scratch
+mkdir <username>
+cd <username>
+git clone --recursive -b feature/HSD_training https://github.com/NOAA-EPIC/ufs-weather-model.git
+cd ufs-weather-model/tests-dev
+export UFSWM="$(pwd)"
+```
+
+#2020 CAPE
+#open a new terminal window
+```
+cd /scratch/<username>/ufs-weather-model/tests-dev
+export UFSWM="$(pwd)"
+cd $UFSWM
+./ufs_test.sh -s
+./ufs_test.sh -a epic -k -r -c -n"2020_CAPE intel"
+rocotostat -d rocoto_workflow.db -w rocoto_workflow.xml
+squeue
+ls -l
+vim ufs_test.yaml
+cd run_dir 
+cd compile_atm_dyn32_intel
+tail -f out
+# exit tail command with ctrl+c
+vim job_card 
+vim out
+#or tail -f out
+```
+```
+cd 2020_CAPE_intel
+cd INPUT; ls
+cd ..
+vim input.nml
+vim model_configure
+tail -f out
+tail -f err
+cd $UFSWM
+ls -l
+cd /scratch/<username>/RT_RUNDIRS/root/FV3_RT/rt_<rt_number>
+cp /scratch/<user>/ufs-weather-model/tests-dev/test_cases/utils/plot_cape.sh .
+./plot_cape.sh
+imgcat *.png
+```
+#Baroclinic wave
+```
+cd $UFSWM
+vim tests/baroclinic_wave
+./ufs_test.sh -a epic -k -r -c -n"baroclinic_wave intel"
+cd run_dir/baroclinic_wave_intel
+tail -f out
+tail -f err
+ls INPUT
+vim input.nml
+vim job_card
+vim modulefiles/modules.fv3.lua
+
+cd $UFSWM
+ls -l
+cd /scratch/<username>/RT_RUNDIRS/root/FV3_RT/rt_<rt_number>
+cp /scratch/<user>/ufs-weather-model/tests-dev/test_cases/utils/plot_bcw.sh .
+./plot_bcw.sh
+imgcat *.png
+```
+
+#Tropical Cyclone
+```
+cd $UFSWM
+./ufs_test.sh -a epic -k -r -c -n"tropical_cyclone intel"
+vim tests/tropical_cyclone
+vim ufs_test.yaml
+vim test_cases/exp_conf/tropical_cyclone.IN
+cd run_dir/tropical_cyclone_intel
+ls INPUT
+cd $UFSWM
+ls -l
+cd /scratch/<username>/RT_RUNDIRS/root/FV3_RT/rt_<rt_number>
+cp /scratch/<user>/ufs-weather-model/tests-dev/test_cases/utils/plot_tc.sh .
+./plot_tc.sh
+imgcat *.png
+```
